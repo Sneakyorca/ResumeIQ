@@ -69,3 +69,83 @@ LANGUAGES
 - English (Fluent)
 - Spanish (Intermediate)
 `;
+export const reportCount = 3;
+export const reports = [
+  {
+    id: 1,
+    score: 72,
+    fileName: "John_Doe_Senior_Designer.pdf",
+    jobTitle: "Product Designer",
+    relativeDate: "10 mins ago",
+    feedBack: "Good, with room to improve",
+    overview:
+      "Your resume is structurally sound and has good baseline formatting, but many bullet points rely on passive responsibility statements rather than concrete quantifiable metrics. Adding numeric results to your achievements will significantly boost your score.",
+    assessment: {
+      impact: {
+        title: "Impact",
+        score: 78,
+        feedBack: "Good metrics, but verbs lack punch.",
+      },
+      clarity: {
+        title: "Clarity",
+        score: 65,
+        feedBack: "Several long sentences reduce readability.",
+      },
+
+      atsFriendliness: {
+        title: "ATS-friendliness",
+        score: 82,
+        feedBack: "Excellent keyword matching.",
+      },
+      formatting: {
+        title: "Formatting",
+        score: 55,
+        feedBack: "Inconsistent margins detected.",
+      },
+    },
+    lineByLineReview: {
+      impact: {
+        title: "Impact",
+        before:
+          "Responsible for writing and designing weekly email newsletters.",
+        after:
+          "Designed and distributed 4 weekly newsletters, boosting open rates by 12% and conversion by 4%.",
+        reason:
+          "Replaced weak passive verb ('Responsible for writing') with active result-oriented verbs. Added explicit metric targets.",
+      },
+      clarity: {
+        title: "Clarity",
+        before:
+          "Responsible for writing and designing weekly email newsletters.",
+        after:
+          "Designed and distributed 4 weekly newsletters, boosting open rates by 12% and conversion by 4%.",
+        reason:
+          "Replaced weak passive verb ('Responsible for writing') with active result-oriented verbs. Added explicit metric targets.",
+      },
+
+      atsFriendliness: {
+        title: "ATS-friendliness",
+        before:
+          "Responsible for writing and designing weekly email newsletters.",
+        after:
+          "Designed and distributed 4 weekly newsletters, boosting open rates by 12% and conversion by 4%.",
+        reason:
+          "Replaced weak passive verb ('Responsible for writing') with active result-oriented verbs. Added explicit metric targets.",
+      },
+    },
+  },
+  {
+    id: 2,
+    score: 88,
+    fileName: "John_Doe_Backend_Dev.pdf",
+    jobTitle: "Software Engineer",
+    relativeDate: "Yesterday",
+  },
+  {
+    id: 3,
+    score: 48,
+    fileName: "John_Doe_Old_v1.pdf",
+    jobTitle: "UX Generalist",
+    relativeDate: "5 days ago",
+  },
+];

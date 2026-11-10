@@ -3,6 +3,7 @@
 import { Separator } from "@/components/ui/separator";
 
 import useMediaQuery from "@/hooks/MediaQuery";
+import { ScoreRing } from "../common/ScoreRing";
 
 type ScoreCardProps = {
   score?: number;
@@ -16,46 +17,11 @@ export function ScoreCard({ score = 68 }: ScoreCardProps) {
   const isDesktop = useMediaQuery("(min-width:768px)");
 
   return (
-    <div className="w-full max-w-[640px] mx-auto p-1 gap-1 md:p-2 md:gap-2 overflow-hidden rounded-xl border-2 border-border bg-lighter-gray/90 mb-8 sm:mb-16 lg:mb-20">
+    <div className="w-full max-w-[640px] mx-auto p-1 gap-1 md:p-2 md:gap-2 overflow-hidden rounded-xl border-2 border-border bg-background mb-8 sm:mb-16 lg:mb-20">
       <div className="flex min-h-[102px] flex-col gap-3 px-2 py-2 md:flex-row md:items-center md:gap-6 md:px-5 md:py-4">
         <div className="flex items-center gap-4">
           {/* Score */}
-          <div className="relative grid size-15 md:size-18 shrink-0 place-items-center">
-            <svg
-              className="absolute inset-0 size-15 md:size-18 -rotate-90"
-              viewBox="0 0 64 64"
-              aria-hidden="true"
-            >
-              {/* Track */}
-              <circle
-                cx="32"
-                cy="32"
-                r={radius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="5"
-                className="text-lighter-gray"
-              />
-
-              {/* Progress */}
-              <circle
-                cx="32"
-                cy="32"
-                r={radius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="5"
-                strokeLinecap="butt"
-                strokeDasharray={circumference}
-                strokeDashoffset={circumference - progress}
-                className="text-warning"
-              />
-            </svg>
-
-            <span className="relative text-card md:text-[22px] font-bold text-black tracking-wider font-inter leading-none">
-              {score}
-            </span>
-          </div>
+          <ScoreRing score={score} size="large" />
 
           {/* Score information */}
           <div className="min-w-0 flex-1 font-inter">
