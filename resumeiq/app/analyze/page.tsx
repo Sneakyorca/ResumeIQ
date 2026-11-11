@@ -22,7 +22,7 @@ const Analyze = () => {
   } = useResumeForm();
 
   return (
-    <main className="max-w-160 m-4 sm:m-20 sm:mt-12 lg:mt-16 lg:mx-80 lg:mb-25 font-inter flex flex-col justify-center gap-5 sm:gap-8 lg:gap-10 items-center font-inter">
+    <main className="sm:max-w-152 lg:max-w-160 lg:w-full m-4 sm:m-20 sm:mt-12 lg:mt-16 lg:mx-80 lg:mb-25 font-inter flex flex-col gap-5 sm:gap-8 lg:gap-10 self-center flex-1">
       <div className="self-start">
         <h1 className="font-extrabold text-2xl lg:text-[32px] mb-1 sm:mb-2">
           Analyze a resume

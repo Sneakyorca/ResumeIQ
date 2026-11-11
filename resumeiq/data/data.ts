@@ -140,6 +140,60 @@ export const reports = [
     fileName: "John_Doe_Backend_Dev.pdf",
     jobTitle: "Software Engineer",
     relativeDate: "Yesterday",
+    feedBack: "Good, with room to improve",
+    overview:
+      "Your resume demonstrates solid technical experience and relevant industry knowledge. However, several achievements lack measurable outcomes, and some descriptions could communicate your technical contributions more effectively. Focus on highlighting project impact, technical ownership, and measurable improvements.",
+
+    assessment: {
+      impact: {
+        title: "Impact",
+        score: 72,
+        feedBack: "Achievements need stronger measurable outcomes.",
+      },
+      clarity: {
+        title: "Clarity",
+        score: 84,
+        feedBack: "Generally clear, with a few overly complex descriptions.",
+      },
+      atsFriendliness: {
+        title: "ATS-friendliness",
+        score: 76,
+        feedBack: "Some relevant technical keywords are missing.",
+      },
+      formatting: {
+        title: "Formatting",
+        score: 91,
+        feedBack: "Consistent structure and excellent readability.",
+      },
+    },
+
+    lineByLineReview: {
+      impact: {
+        title: "Impact",
+        before: "Worked on improving the performance of the company website.",
+        after:
+          "Optimized website performance, reducing page load time by 35% and improving user experience.",
+        reason:
+          "Replaced a vague responsibility with a specific technical achievement and measurable performance improvement.",
+      },
+      clarity: {
+        title: "Clarity",
+        before:
+          "Was responsible for the development and maintenance of various frontend components used across the application.",
+        after:
+          "Developed and maintained reusable frontend components across the application.",
+        reason:
+          "Removed unnecessary wording and simplified the sentence while preserving its original meaning.",
+      },
+      atsFriendliness: {
+        title: "ATS-friendliness",
+        before: "Built interfaces using modern web technologies.",
+        after:
+          "Developed responsive user interfaces using React, TypeScript, JavaScript, and Tailwind CSS.",
+        reason:
+          "Replaced generic terminology with relevant technical keywords that better communicate your development skills.",
+      },
+    },
   },
   {
     id: 3,
@@ -147,5 +201,61 @@ export const reports = [
     fileName: "John_Doe_Old_v1.pdf",
     jobTitle: "UX Generalist",
     relativeDate: "5 days ago",
+    feedBack: "Good, with room to improve",
+    overview:
+      "Your resume communicates a good understanding of marketing responsibilities and business operations. However, it focuses more on daily activities than the results those activities produced. Strengthen your application by emphasizing campaign performance, customer engagement, and revenue-related achievements.",
+
+    assessment: {
+      impact: {
+        title: "Impact",
+        score: 61,
+        feedBack: "Limited evidence of business and campaign results.",
+      },
+      clarity: {
+        title: "Clarity",
+        score: 73,
+        feedBack: "Some descriptions are repetitive and could be more concise.",
+      },
+      atsFriendliness: {
+        title: "ATS-friendliness",
+        score: 88,
+        feedBack: "Strong alignment with common marketing keywords.",
+      },
+      formatting: {
+        title: "Formatting",
+        score: 68,
+        feedBack: "Section spacing and heading styles need consistency.",
+      },
+    },
+
+    lineByLineReview: {
+      impact: {
+        title: "Impact",
+        before:
+          "Managed social media accounts and created content for the business.",
+        after:
+          "Managed 3 social media platforms, increasing audience engagement by 42% over 6 months.",
+        reason:
+          "Highlighted the scale of responsibility and introduced a measurable engagement result.",
+      },
+      clarity: {
+        title: "Clarity",
+        before:
+          "Worked with different teams to ensure that marketing campaigns were properly planned and executed.",
+        after:
+          "Collaborated with cross-functional teams to plan and execute marketing campaigns.",
+        reason:
+          "Removed redundant phrases and used more direct language to communicate the responsibility.",
+      },
+      atsFriendliness: {
+        title: "ATS-friendliness",
+        before:
+          "Helped attract customers through online promotional activities.",
+        after:
+          "Executed digital marketing campaigns using SEO, email marketing, content strategy, and social media advertising.",
+        reason:
+          "Introduced specific marketing terminology to improve keyword relevance and communicate practical expertise.",
+      },
+    },
   },
 ];

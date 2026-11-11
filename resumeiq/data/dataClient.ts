@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { sampleResume } from "@/data/data";
+import { useRouter } from "next/navigation";
 
 export type ResumeFormData = {
   resume: string;
@@ -10,7 +11,7 @@ export type ResumeFormData = {
 
 const RESUME_KEY = "resume-draft";
 const FILE_KEY = "resume-file-name";
-export const FAKE_PARSE_MS = 1800; // remove when real parsing is in
+export const FAKE_PARSE_MS = 180; // remove when real parsing is in
 
 export function useResumeForm() {
   const {
@@ -27,6 +28,7 @@ export function useResumeForm() {
   const [isDragging, setIsDragging] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // restore saved draft on mount
   useEffect(() => {
@@ -137,6 +139,7 @@ export function useResumeForm() {
       try {
         sessionStorage.removeItem(FILE_KEY);
       } catch {}
+      router.push("/reports");
     } catch (error) {
       setError("resume", {
         type: "manual",

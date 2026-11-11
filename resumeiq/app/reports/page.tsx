@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const ReportDashboard = () => {
   return (
-    <section className="p-4 sm:p-10 lg:px-12 lg:py-20 w-full flex justify-center bg-background font-inter">
+    <section className="p-4 sm:p-10 lg:px-12 lg:py-20 w-full flex justify-center bg-background font-inter flex-1">
       <main className="max-w-250 w-full">
         <div className="flex justify-between items-center mb-5 sm:mb-8 lg:mb-10">
           <div className="flex flex-col gap-0.5 sm:gap-1 lg:gap-1.5">
