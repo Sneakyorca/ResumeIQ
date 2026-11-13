@@ -1,4 +1,4 @@
-import { ai, MODEL } from "@/lib/gemini";
+import { ai, withModelFallback } from "@/lib/gemini";
 import * as z from "zod";
 
 const Section = z.object({
@@ -43,15 +43,18 @@ export type ReportView = Report & {
 };
 
 export async function analyzeResume(resumeText: string): Promise<Analysis> {
-  const interaction = await ai.interactions.create({
-    model: MODEL,
-    input: `You are a resume reviewer. Analyze the resume below and score each category from 0 to 100. For lineByLineReview, quote a real weak line from the resume as "before" and rewrite it as "after".\n\nRESUME:\n${resumeText}`,
-    response_format: {
-      type: "text",
-      mime_type: "application/json",
-      schema: z.toJSONSchema(AnalysisSchema),
-    },
+  const output = await withModelFallback(async (model) => {
+    const interaction = await ai.interactions.create({
+      model,
+      input: `You are a resume reviewer. Analyze the resume below and score each category from 0 to 100. For lineByLineReview, quote a real weak line from the resume as "before" and rewrite it as "after".\n\nRESUME:\n${resumeText}`,
+      response_format: {
+        type: "text",
+        mime_type: "application/json",
+        schema: z.toJSONSchema(AnalysisSchema),
+      },
+    });
+    return interaction.output_text;
   });
 
-  return AnalysisSchema.parse(JSON.parse(interaction.output_text));
+  return AnalysisSchema.parse(JSON.parse(output));
 }
