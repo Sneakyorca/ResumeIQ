@@ -1,5 +1,7 @@
+export const maxDuration = 60;
 import { PDFParse } from "pdf-parse";
 import { extractTextWithGemini } from "@/lib/ai/extractText";
+import mammoth from "mammoth";
 
 const MIN_CHARS = 50;
 
@@ -10,12 +12,71 @@ function cleanText(text: string) {
     .trim();
 }
 
+function detectFileType(buffer: Buffer): "pdf" | "docx" | "unknown" {
+  // PDF starts with "%PDF-" (hex: 25 50 44 46 2D)
+  if (buffer.subarray(0, 5).toString("ascii") === "%PDF-") {
+    return "pdf";
+  }
+
+  // DOCX (ZIP archive) starts with "PK\x03\x04" (hex: 50 4B 03 04)
+  if (
+    buffer[0] === 0x50 &&
+    buffer[1] === 0x4b &&
+    buffer[2] === 0x03 &&
+    buffer[3] === 0x04
+  ) {
+    return "docx";
+  }
+
+  return "unknown";
+}
+
 export async function POST(request: Request) {
   const buffer = Buffer.from(await request.arrayBuffer());
 
   if (buffer.byteLength === 0) {
     return Response.json({ error: "Empty file." }, { status: 400 });
   }
+  if (buffer.byteLength > 10 * 1024 * 1024) {
+    return Response.json(
+      { error: "File is too large (max 10 MB)." },
+      { status: 413 },
+    );
+  }
+  const fileType = detectFileType(buffer);
+
+  if (fileType === "unknown") {
+    return Response.json(
+      { error: "Unsupported file type. Please upload a PDF or DOCX." },
+      { status: 415 },
+    );
+  }
+
+  //DOCX handler
+
+  if (fileType === "docx") {
+    try {
+      const result = await mammoth.extractRawText({ buffer });
+      const text = cleanText(result.value);
+
+      if (text.length < MIN_CHARS) {
+        return Response.json(
+          { error: "No readable text found in this document." },
+          { status: 422 },
+        );
+      }
+
+      return Response.json({ text });
+    } catch (err) {
+      console.error("DOCX parse failed:", err);
+      return Response.json(
+        { error: "Couldn't read this Word file. It may be corrupt." },
+        { status: 422 },
+      );
+    }
+  }
+
+  // PDF handler
 
   const parser = new PDFParse({ data: new Uint8Array(buffer) });
 

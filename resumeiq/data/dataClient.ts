@@ -11,7 +11,7 @@ export type ResumeFormData = {
 
 const RESUME_KEY = "resume-draft";
 const FILE_KEY = "resume-file-name";
-export const FAKE_PARSE_MS = 180; // remove when real parsing is in
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 export function useResumeForm() {
   const {
@@ -27,6 +27,7 @@ export function useResumeForm() {
   const [fileName, setFileName] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
+  const [fileError, setFileError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -53,6 +54,7 @@ export function useResumeForm() {
   }, [watch]);
 
   function handleSample() {
+    setFileError("");
     setFileName("");
     try {
       sessionStorage.removeItem(FILE_KEY);
@@ -63,41 +65,55 @@ export function useResumeForm() {
     });
   }
   async function parseResume(file: File) {
-    const response = await fetch("/api/parse", { method: "POST", body: file });
-    const result = await response.json();
-    if (!response.ok)
-      throw new Error(result.error || "Couldn't read that file.");
-    return result.text as string;
-  }
-  async function processFile(selectedFile: File) {
-    if (isParsing) return; // ignore drops/picks while one is running
+    let response: Response;
+    try {
+      response = await fetch("/api/parse", { method: "POST", body: file });
+    } catch {
+      throw new Error("Couldn't reach the server. Check your connection.");
+    }
 
-    const isValid = /\.(pdf|docx)$/i.test(selectedFile.name);
-    if (!isValid) {
-      setError("resume", {
-        type: "manual",
-        message: "Please upload a .pdf or .docx file",
-      });
+    let result: { text?: string; error?: string } = {};
+    try {
+      result = await response.json();
+    } catch {}
+
+    if (!response.ok || !result.text) {
+      throw new Error(
+        result.error || "Couldn't read that file. Try another one.",
+      );
+    }
+    return result.text;
+  }
+
+  async function processFile(selectedFile: File) {
+    if (isParsing) return;
+    setFileError("");
+
+    if (!/\.(pdf|docx)$/i.test(selectedFile.name)) {
+      setFileError("Please upload a .pdf or .docx file.");
       return;
     }
+    if (selectedFile.size > MAX_FILE_BYTES) {
+      setFileError("That file is too large. The limit is 10 MB.");
+      return;
+    }
+
     setIsParsing(true);
     setFileName(selectedFile.name);
 
     try {
       const text = await parseResume(selectedFile);
-
       setValue("resume", text, { shouldValidate: true, shouldDirty: true });
       try {
         sessionStorage.setItem(FILE_KEY, selectedFile.name);
       } catch {}
     } catch (err) {
-      setError("resume", {
-        type: "manual",
-        message:
-          err instanceof Error
-            ? err.message
-            : "Couldn't read that file. Try another one.",
-      });
+      setFileName("");
+      setFileError(
+        err instanceof Error
+          ? err.message
+          : "Couldn't read that file. Try another one.",
+      );
     } finally {
       setIsParsing(false);
     }
@@ -136,9 +152,19 @@ export function useResumeForm() {
         body: JSON.stringify({ ...data, fileName }),
       });
 
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Failed to send");
-      console.log("Submitted resume:", result.message);
+      let result: { message?: unknown } = {};
+      try {
+        result = await response.json();
+      } catch {}
+
+      if (!response.ok) {
+        throw new Error(
+          typeof result.message === "string"
+            ? result.message
+            : "Something went wrong. Please try again.",
+        );
+      }
+
       reset();
       setFileName("");
       try {
@@ -169,5 +195,6 @@ export function useResumeForm() {
     handleDragOver,
     handleDragLeave,
     handleDrop,
+    fileError,
   };
 }

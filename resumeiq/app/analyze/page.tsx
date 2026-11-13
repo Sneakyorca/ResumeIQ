@@ -19,6 +19,8 @@ const Analyze = () => {
     isSubmitting,
     onSubmit,
     handleSubmit,
+    errors,
+    fileError,
   } = useResumeForm();
 
   return (
@@ -40,6 +42,7 @@ const Analyze = () => {
         handleDragOver={handleDragOver}
         handleDragLeave={handleDragLeave}
         handleDrop={handleDrop}
+        error={fileError}
       />
       <div className="flex items-center gap-3 w-full">
         <Separator className="flex-1 w-auto" />
@@ -79,10 +82,21 @@ const Analyze = () => {
               : "border-border bg-white"
           }`}
         />
+        {errors.resume && (
+          <p role="alert" className="text-red-500 text-[13px] mb-4">
+            {errors.resume.message?.toString()}
+          </p>
+        )}
         <AnalyzeButton
           isSubmitting={isSubmitting}
+          isParsing={isParsing}
           className="items-center self-center"
         />
+        {isSubmitting && (
+          <p role="status" className="mt-3 text-center text-xs text-light-gray">
+            Analyzing your resume. This takes a few seconds.
+          </p>
+        )}
       </form>{" "}
     </main>
   );

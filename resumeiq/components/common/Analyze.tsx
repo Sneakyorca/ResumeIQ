@@ -2,38 +2,32 @@
 
 import { DragEvent } from "react";
 import { UseFormRegister } from "react-hook-form";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Button } from "../ui/button";
 import type { ResumeFormData } from "@/data/dataClient";
+import { Loader2 } from "lucide-react";
 
 type AnalyzeButtonProps = {
   isSubmitting: boolean;
+  isParsing?: boolean;
   className?: string;
 };
 
 export const AnalyzeButton = ({
   isSubmitting,
+  isParsing = false,
   className = "",
 }: AnalyzeButtonProps) => {
   return (
     <Button
       type="submit"
-      disabled={isSubmitting}
+      disabled={isSubmitting || isParsing}
       aria-busy={isSubmitting}
-      className={
-        "flex items-center justify-center w-full sm:w-51.5 lg:w-54 h-10.5 lg:h-11.75 px-6 sm:px-8 rounded-md text-[15px] lg:text-[16px] font-semibold font-inter text-white tracking-wider disabled:opacity-80" +
-        className
-      }
+      className={`flex items-center justify-center gap-2 w-full sm:w-51.5 lg:w-54 h-10.5 lg:h-11.75 px-6 sm:px-8 rounded-md text-[15px] lg:text-[16px] font-semibold font-inter text-white tracking-wider disabled:opacity-80 ${className}`}
     >
       {isSubmitting ? (
         <>
-          <DotLottieReact
-            src="https://lottie.host/d9090562-960c-45db-ac11-4a50850f6ebb/Bs3aYMiEtD.lottie"
-            loop
-            autoplay
-            style={{ width: 80, height: 80, margin: -24 }}
-          />
-          <span className="sr-only">Analyzing resume…</span>
+          <Loader2 className="size-4 animate-spin" />
+          Analyzing…
         </>
       ) : (
         "Analyze resume"
