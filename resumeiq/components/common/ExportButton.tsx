@@ -1,31 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import type { ReportView } from "@/lib/ai/analyzeText";
 
-type Report = {
-  overallScore: number;
-  fileName: string;
-  jobTitle: string;
-  relativeDate: string;
-  feedBack: string;
-  overview: string;
-  assessment: Record<
-    string,
-    { title: string; score: number; feedBack: string }
-  >;
-  lineByLineReview: Record<
-    string,
-    {
-      title: string;
-      before: string;
-      after: string;
-      reason: string;
-    }
-  >;
-};
 type ExportButtonProps = {
-  report: Report;
+  report: ReportView;
 };
-
 const escapeHTML = (value: string) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -96,7 +75,7 @@ const styles = `
   .rq-footer { border-top: 1px solid #e5e7eb; padding-top: 14px; margin-top: 30px; text-align: center; font-size: 11px; color: #9ca3af; }
 `;
 
-const buildHTML = (report: Report) => {
+const buildHTML = (report: ReportView) => {
   const assessmentHTML = Object.values(report.assessment ?? {})
     .map((item) => {
       const s = clamp(item.score);
@@ -149,7 +128,7 @@ const buildHTML = (report: Report) => {
       <div class="rq-brand">RESUMEIQ</div>
       <h1>Resume Analysis Report</h1>
       <div class="rq-meta">
-        ${escapeHTML(report.fileName)} · ${escapeHTML(report.jobTitle)} · ${escapeHTML(report.relativeDate)}
+        ${escapeHTML(new Date(report.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }))}
       </div>
     </div>
 
@@ -175,7 +154,7 @@ const buildHTML = (report: Report) => {
   `;
 };
 
-const exportReport = async (report: Report) => {
+const exportReport = async (report: ReportView) => {
   const html2pdf = (await import("html2pdf.js")).default;
 
   // Off-screen, but still rendered (not display:none)
@@ -192,7 +171,6 @@ const exportReport = async (report: Report) => {
   wrapper.appendChild(root);
   document.body.appendChild(wrapper);
 
-  // Make sure the web font is loaded before the snapshot is taken
   try {
     await document.fonts.load("400 13px " + root.style.fontFamily);
     await document.fonts.load("700 13px " + root.style.fontFamily);
@@ -203,32 +181,34 @@ const exportReport = async (report: Report) => {
   const baseName = report.fileName.replace(/\.[^/.]+$/, "") || "report";
   const safeName = baseName.replace(/[^a-z0-9-_]+/gi, "-");
 
+  const options = {
+    margin: [16, 16, 16, 16],
+    filename: `ResumeIQ-Report-${safeName}.pdf`,
+    image: { type: "png" },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: PAGE_WIDTH_PX,
+    },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: {
+      mode: ["css", "legacy"],
+      avoid: [
+        ".rq-keep",
+        ".rq-review",
+        ".rq-metric",
+        ".rq-score-card",
+        ".rq-footer",
+      ],
+    },
+  };
+
   try {
     await html2pdf()
-      .set({
-        margin: [16, 16, 16, 16],
-        filename: `ResumeIQ-Report-${safeName}.pdf`,
-        image: { type: "png" },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          scrollX: 0,
-          scrollY: 0, // stops blank space at the top when the page is scrolled
-          windowWidth: PAGE_WIDTH_PX,
-        },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: {
-          mode: ["css", "legacy"],
-          avoid: [
-            ".rq-keep",
-            ".rq-review",
-            ".rq-metric",
-            ".rq-score-card",
-            ".rq-footer",
-          ],
-        },
-      })
+      .set(options as never)
       .from(root)
       .save();
   } finally {

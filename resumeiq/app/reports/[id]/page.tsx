@@ -64,7 +64,7 @@ const ReportPage = async ({ params }: { params: Promise<{ id: string }> }) => {
               </Link>
               <Separator
                 orientation="vertical"
-                className="h-[15px] sm:h-[16px] lg:h-[17px] bg-light-gray"
+                className="h-3.75 sm:h-4 lg:h-4.25 bg-light-gray"
               />
               <Link href="/reports" className="text-dark-gray">
                 Back to reports

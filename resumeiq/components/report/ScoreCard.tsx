@@ -2,12 +2,13 @@ import { ScoreRing } from "../common/ScoreRing";
 import { Separator } from "../ui/separator";
 import CopyButton from "../common/CopyButton";
 import ExportButton from "../common/ExportButton";
+import { ReportView } from "@/lib/ai/analyzeText";
 type ScoreCard = {
   score: number;
   fileName: string;
   overview: string;
   relativeDate: string;
-  report: Record<string, any>;
+  report: ReportView;
 };
 const ScoreCard = ({
   score,

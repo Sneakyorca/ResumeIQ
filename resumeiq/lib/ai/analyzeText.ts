@@ -53,7 +53,9 @@ export async function analyzeResume(resumeText: string): Promise<Analysis> {
         schema: z.toJSONSchema(AnalysisSchema),
       },
     });
-    return interaction.output_text;
+    const text = interaction.output_text;
+    if (!text) throw new Error("Empty response from model");
+    return text;
   });
 
   return AnalysisSchema.parse(JSON.parse(output));

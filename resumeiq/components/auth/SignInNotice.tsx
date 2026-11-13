@@ -3,7 +3,7 @@ import { CircleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const SignInNotice = () => {
-  const navRef = useRef<HTMLElement | null>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
 
   useEffect(() => {

@@ -75,7 +75,6 @@ LANGUAGES
 `;
 export const reports: Report[] = (g.__reports ??= [
   {
-    id: 1,
     overallScore: 72,
     fileName: "John_Doe_Senior_Designer.pdf",
     jobTitle: "Product Designer",
@@ -138,7 +137,6 @@ export const reports: Report[] = (g.__reports ??= [
     },
   },
   {
-    id: 2,
     overallScore: 88,
     fileName: "John_Doe_Backend_Dev.pdf",
     jobTitle: "Software Engineer",
@@ -199,7 +197,6 @@ export const reports: Report[] = (g.__reports ??= [
     },
   },
   {
-    id: 3,
     overallScore: 48,
     fileName: "John_Doe_Old_v1.pdf",
     jobTitle: "UX Generalist",
