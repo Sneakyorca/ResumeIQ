@@ -1,15 +1,36 @@
-export async function POST(request: Request) {
-  const body = await request.json();
-  const { resume } = body;
-  console.log(resume);
-  await new Promise((res) => setTimeout(res, 3000));
+import { analyzeResume, type Report } from "@/lib/ai/analyzeText";
+import { saveReport } from "@/lib/reports";
 
-  return Response.json(
-    {
-      success: true,
-      message: "Resume sucessfully submitted",
-      content: resume,
-    },
-    { status: 200 },
-  );
+export async function POST(request: Request) {
+  try {
+    const { resume, fileName } = await request.json();
+
+    if (!resume || typeof resume !== "string") {
+      return Response.json({ message: "Invalid resume data" }, { status: 400 });
+    }
+
+    const analysis = await analyzeResume(resume);
+    const now = Date.now();
+
+    const report: Report = {
+      ...analysis,
+      fileName:
+        typeof fileName === "string" && fileName ? fileName : "Pasted resume",
+      createdAt: now,
+    };
+    await saveReport(report);
+
+    return Response.json({ message: report }, { status: 200 });
+  } catch (error) {
+    console.error("Error analyzing resume:", error);
+    const busy = String(error).includes("429");
+    return Response.json(
+      {
+        message: busy
+          ? "The AI is busy right now. Try again in a minute."
+          : "Error analyzing resume",
+      },
+      { status: busy ? 429 : 500 },
+    );
+  }
 }

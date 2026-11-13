@@ -5,7 +5,7 @@ import Link from "next/link";
 import { isLoggedIn, profile } from "@/data/data";
 import MenuToggle from "../ui/MenuToggle";
 import MobileMenuBar from "./MobileMenu";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,11 +26,11 @@ const Navbar = () => {
     <div style={{ height }}>
       <nav
         ref={navRef}
-        className="flex items-center justify-between py-3 px-4 sm:py-4 sm:px-10 lg:py-6 lg:px-14 border border-border z-10 w-full bg-white fixed left-0 top-0"
+        className="flex items-center justify-between py-3 px-4 sm:py-4 sm:px-10 lg:py-6 lg:px-14 border border-border z-30 w-full bg-white fixed left-0 top-0"
       >
         <Link
           href="/"
-          className="text-black text-body-lg md:text-card capitalize font-sans font-bold flex items-center gap-2"
+          className="text-black text-body-lg md:text-card font-sans font-bold flex items-center gap-2"
         >
           <Image
             src="/logo.svg"
@@ -39,7 +39,7 @@ const Navbar = () => {
             width={32}
             height={32}
           />
-          RESUMEIQ
+          ResumeIQ
         </Link>
         <ul className="gap-8 items-center justify-center hidden sm:flex ">
           <NavItem />

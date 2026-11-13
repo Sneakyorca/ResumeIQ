@@ -16,6 +16,7 @@
   --destructive: #dc2626;
   --warning: #f59e0b;
   --score-red: #ef4444;
+  --notice-yellow: #fef3c7;
 
   /* Texts */
 
@@ -41,6 +42,7 @@
   --color-destructive: var(--destructive);
   --color-warning: var(--warning);
   --color-score-red: var(--score-red);
+  --color-notice-yellow: var(--notice-yellow);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-inter: var(--font-inter);
@@ -103,5 +105,43 @@
   }
   to {
     width: 100%;
+  }
+}
+
+@theme {
+  --animate-auth-in-right: auth-in-right 0.35s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+  --animate-auth-in-left: auth-in-left 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-auth-in-up: auth-in-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes auth-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes auth-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes auth-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

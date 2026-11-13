@@ -1,7 +1,11 @@
+import type { Report } from "@/lib/ai/analyzeText";
 export const isLoggedIn = false;
 export const profile = {
   name: "Judeius Namius",
 };
+
+const g = globalThis as unknown as { __reports?: Report[] };
+
 export const sampleResume = `
 JOHN DOE
 Frontend Developer
@@ -69,14 +73,13 @@ LANGUAGES
 - English (Fluent)
 - Spanish (Intermediate)
 `;
-export const reportCount = 3;
-export const reports = [
+export const reports: Report[] = (g.__reports ??= [
   {
     id: 1,
-    score: 72,
+    overallScore: 72,
     fileName: "John_Doe_Senior_Designer.pdf",
     jobTitle: "Product Designer",
-    relativeDate: "10 mins ago",
+    createdAt: Date.now() - 2 * 86_400_000, // 2 days ago
     feedBack: "Good, with room to improve",
     overview:
       "Your resume is structurally sound and has good baseline formatting, but many bullet points rely on passive responsibility statements rather than concrete quantifiable metrics. Adding numeric results to your achievements will significantly boost your score.",
@@ -136,10 +139,10 @@ export const reports = [
   },
   {
     id: 2,
-    score: 88,
+    overallScore: 88,
     fileName: "John_Doe_Backend_Dev.pdf",
     jobTitle: "Software Engineer",
-    relativeDate: "Yesterday",
+    createdAt: Date.now() - 2 * 86_400_000, // 2 days ago
     feedBack: "Good, with room to improve",
     overview:
       "Your resume demonstrates solid technical experience and relevant industry knowledge. However, several achievements lack measurable outcomes, and some descriptions could communicate your technical contributions more effectively. Focus on highlighting project impact, technical ownership, and measurable improvements.",
@@ -197,10 +200,10 @@ export const reports = [
   },
   {
     id: 3,
-    score: 48,
+    overallScore: 48,
     fileName: "John_Doe_Old_v1.pdf",
     jobTitle: "UX Generalist",
-    relativeDate: "5 days ago",
+    createdAt: Date.now() - 2 * 86_400_000, // 2 days ago
     feedBack: "Good, with room to improve",
     overview:
       "Your resume communicates a good understanding of marketing responsibilities and business operations. However, it focuses more on daily activities than the results those activities produced. Strengthen your application by emphasizing campaign performance, customer engagement, and revenue-related achievements.",
@@ -258,4 +261,34 @@ export const reports = [
       },
     },
   },
-];
+]);
+
+type Row = {
+  id: string;
+  file_name: string | null;
+  job_title: string | null;
+  overall_score: number;
+  verdict: string | null;
+  overview: string | null;
+  category_scores: Record<
+    string,
+    { title: string; score: number; feedback: string }
+  >;
+  rewrites: Record<
+    string,
+    { title: string; before: string; after: string; reason: string }
+  >;
+  created_at: string;
+};
+
+export const toReport = (r: Row) => ({
+  id: r.id,
+  fileName: r.file_name,
+  jobTitle: r.job_title,
+  overallScore: r.overall_score,
+  feedback: r.verdict,
+  overview: r.overview,
+  assessment: r.category_scores, // same shape, no reshaping
+  lineByLineReview: r.rewrites, // same shape, no reshaping
+  createdAt: r.created_at, // format "10 mins ago" in the UI
+});

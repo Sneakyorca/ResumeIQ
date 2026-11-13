@@ -62,6 +62,13 @@ export function useResumeForm() {
       shouldDirty: true,
     });
   }
+  async function parseResume(file: File) {
+    const response = await fetch("/api/parse", { method: "POST", body: file });
+    const result = await response.json();
+    if (!response.ok)
+      throw new Error(result.error || "Couldn't read that file.");
+    return result.text as string;
+  }
   async function processFile(selectedFile: File) {
     if (isParsing) return; // ignore drops/picks while one is running
 
@@ -73,24 +80,23 @@ export function useResumeForm() {
       });
       return;
     }
-
     setIsParsing(true);
     setFileName(selectedFile.name);
 
     try {
-      // TODO: replace this fake delay + sample with the real parser:
-      // const text = await parseResume(selectedFile);
-      await new Promise((r) => setTimeout(r, FAKE_PARSE_MS));
-      const text = sampleResume;
+      const text = await parseResume(selectedFile);
 
       setValue("resume", text, { shouldValidate: true, shouldDirty: true });
       try {
         sessionStorage.setItem(FILE_KEY, selectedFile.name);
       } catch {}
-    } catch {
+    } catch (err) {
       setError("resume", {
         type: "manual",
-        message: "Couldn't read that file. Try another one.",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Couldn't read that file. Try another one.",
       });
     } finally {
       setIsParsing(false);
@@ -127,13 +133,12 @@ export function useResumeForm() {
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, fileName }),
       });
 
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Failed to send");
-
-      console.log(result);
+      console.log("Submitted resume:", result.message);
       reset();
       setFileName("");
       try {

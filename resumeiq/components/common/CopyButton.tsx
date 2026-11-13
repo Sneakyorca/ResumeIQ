@@ -33,7 +33,7 @@ const CopyButton = ({
           : `
 RESUME ANALYSIS REPORT
 
-Score: ${copyItem.score}%
+Score: ${copyItem.overallScore}%
 File Name: ${copyItem.fileName}
 Job Title: ${copyItem.jobTitle}
 Feedback: ${copyItem.feedBack}

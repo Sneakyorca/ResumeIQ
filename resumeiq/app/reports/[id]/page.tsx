@@ -1,14 +1,16 @@
 import InfoCard from "@/components/report/InfoCard";
 import ScoreCard from "@/components/report/ScoreCard";
-import { reports } from "@/data/data";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ImprovementCard from "@/components/report/ImprovementCard";
 import { Separator } from "@/components/ui/separator";
+import { notFound } from "next/navigation";
+import { getReport } from "@/lib/reports";
 
 const ReportPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
-  const report = reports[parseInt(id) - 1];
+  const report = await getReport(id);
+  if (!report) notFound();
   return (
     <>
       <section className="p-4 sm:pt-8 sm:px-10 sm:pb-16 lg:p-20 lg:pt-8 bg-background font-inter min-h-screen">
@@ -25,7 +27,7 @@ const ReportPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           <ScoreCard
             fileName={report.fileName}
             overview={report.overview}
-            score={report.score}
+            score={report.overallScore}
             relativeDate={report.relativeDate}
             report={report}
           />

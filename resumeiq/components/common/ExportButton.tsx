@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 type Report = {
-  score: number;
+  overallScore: number;
   fileName: string;
   jobTitle: string;
   relativeDate: string;
@@ -140,7 +140,7 @@ const buildHTML = (report: Report) => {
     })
     .join("");
 
-  const s = clamp(report.score);
+  const s = clamp(report.overallScore);
 
   return `
     <style>${styles}</style>
