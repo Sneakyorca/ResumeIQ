@@ -3,6 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CircleCheck } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ResetSchema, type ResetValues } from "@/lib/schemas/auth";
+import { updatePassword } from "@/app/auth/actions";
 import {
   Field,
   FormHeader,
@@ -11,48 +15,23 @@ import {
   linkClass,
 } from "./form-controls";
 
-export default function ResetPasswordForm({ token }: { token?: string }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>();
+export default function ResetPasswordForm({
+  hasSession,
+}: {
+  hasSession: boolean;
+}) {
   const [done, setDone] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetValues>({ resolver: zodResolver(ResetSchema) });
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const password = String(data.get("password"));
-    const confirm = String(data.get("confirm"));
-
-    if (password.length < 8)
-      return setError("Password must be at least 8 characters.");
-    if (password !== confirm) return setError("Passwords don't match.");
-
-    setError(undefined);
-    setLoading(true);
-    // TODO: call your reset action with `token` and `password`
-    setLoading(false);
+  async function onSubmit(values: ResetValues) {
+    const res = await updatePassword(values);
+    if (res?.error) return setError("root", { message: res.error });
     setDone(true);
-  }
-
-  if (!token) {
-    return (
-      <div className="flex flex-col items-center gap-5 sm:gap-6 w-full animate-auth-in-up motion-reduce:animate-none">
-        <div className="flex flex-col gap-1 items-center text-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-black">
-            Link is invalid or expired
-          </h1>
-          <p className="text-xs sm:text-sm text-dark-gray">
-            Reset links only work once and expire after a short time. Request a
-            new one to continue.
-          </p>
-        </div>
-        <Link
-          href="/auth/forgot-password"
-          className="w-full h-10 sm:h-11 rounded-lg bg-primary-600 hover:bg-primary-700 transition text-white text-[13px] sm:text-sm font-semibold flex items-center justify-center"
-        >
-          Request a new link
-        </Link>
-      </div>
-    );
   }
 
   if (done) {
@@ -71,9 +50,31 @@ export default function ResetPasswordForm({ token }: { token?: string }) {
         </div>
         <Link
           href="/auth?mode=signin"
-          className="w-full h-10 sm:h-11 rounded-lg bg-primary-600 hover:bg-primary-700 transition text-white text-[13px] sm:text-sm font-semibold flex items-center justify-center"
+          className="w-full h-10 sm:h-11 rounded-lg bg-primary-600 hover:bg-primary-700 transition text-white text-[13px] sm:text-sm font-semibold flex items-center justify-center bg-primary"
         >
           Continue to sign in
+        </Link>
+      </div>
+    );
+  }
+
+  if (!hasSession) {
+    return (
+      <div className="flex flex-col items-center gap-5 sm:gap-6 w-full animate-auth-in-up motion-reduce:animate-none">
+        <div className="flex flex-col gap-1 items-center text-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-black">
+            Link is invalid or expired
+          </h1>
+          <p className="text-xs sm:text-sm text-dark-gray">
+            Reset links only work once and expire after a short time. Request a
+            new one to continue.
+          </p>
+        </div>
+        <Link
+          href="/auth/forgot-password"
+          className="w-full h-10 sm:h-11 rounded-lg bg-primary-600 hover:bg-primary-700 transition text-white text-[13px] sm:text-sm font-semibold flex items-center justify-center bg-primary"
+        >
+          Request a new link
         </Link>
       </div>
     );
@@ -85,28 +86,41 @@ export default function ResetPasswordForm({ token }: { token?: string }) {
         title="Set a new password"
         subtitle="Choose a password you haven't used before"
       />
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 sm:gap-5 w-full">
-        <Field label="New password" htmlFor="reset-password">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="flex flex-col gap-4 sm:gap-5 w-full"
+      >
+        <Field
+          label="New password"
+          htmlFor="reset-password"
+          error={errors.password?.message}
+        >
           <PasswordInput
             id="reset-password"
-            name="password"
             autoComplete="new-password"
             placeholder="8+ characters"
-            minLength={8}
-            required
+            aria-invalid={!!errors.password}
+            {...register("password")}
           />
         </Field>
-        <Field label="Confirm password" htmlFor="reset-confirm" error={error}>
+        <Field
+          label="New password"
+          htmlFor="reset-password"
+          error={errors.password?.message ?? errors.root?.message}
+        >
           <PasswordInput
-            id="reset-confirm"
-            name="confirm"
+            id="reset-password"
             autoComplete="new-password"
-            placeholder="Re-enter password"
-            aria-invalid={!!error}
-            required
+            placeholder="8+ characters"
+            aria-invalid={!!errors.password}
+            {...register("password")}
           />
+          <p className="text-[11px] sm:text-xs text-dark-gray">
+            8+ characters with upper and lower case, a number, and a symbol.
+          </p>
         </Field>
-        <SubmitButton loading={loading}>Reset password</SubmitButton>
+        <SubmitButton loading={isSubmitting}>Reset password</SubmitButton>
       </form>
       <p className="text-xs sm:text-sm text-dark-gray text-center">
         Remembered it?{" "}

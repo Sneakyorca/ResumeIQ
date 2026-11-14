@@ -1,16 +1,16 @@
 import AuthShell from "@/components/auth/auth-shell";
 import ResetPasswordForm from "@/components/auth/reset-password-form";
+import { createClient } from "@/utils/supabase/server";
 
-export default async function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ token?: string }>;
-}) {
-  const { token } = await searchParams;
+export default async function ResetPasswordPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <AuthShell>
-      <ResetPasswordForm token={token} />
+      <ResetPasswordForm hasSession={!!user} />
     </AuthShell>
   );
 }

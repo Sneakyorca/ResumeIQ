@@ -1,8 +1,4 @@
 import type { Report } from "@/lib/ai/analyzeText";
-export const isLoggedIn = false;
-export const profile = {
-  name: "Judeius Namius",
-};
 
 const g = globalThis as unknown as { __reports?: Report[] };
 

@@ -13,10 +13,26 @@ import {
   linkClass,
 } from "./form-controls";
 import Link from "next/link";
+import { MailCheck } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  SignInSchema,
+  SignUpSchema,
+  type SignInValues,
+  type SignUpValues,
+} from "@/lib/schemas/auth";
+import { signIn, signUp } from "@/app/auth/actions";
 
 type Mode = "signin" | "signup";
 
-export default function AuthCard({ initialMode }: { initialMode: Mode }) {
+export default function AuthCard({
+  initialMode,
+  redirectTo,
+}: {
+  initialMode: Mode;
+  redirectTo?: string;
+}) {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [height, setHeight] = useState<number>();
@@ -31,12 +47,14 @@ export default function AuthCard({ initialMode }: { initialMode: Mode }) {
     return () => ro.disconnect();
   }, []);
 
-  const switchTo = (next: Mode) => {
-    if (next === mode) return;
-    setDirection(next === "signup" ? "right" : "left");
-    setMode(next);
-    // keep the URL in sync without a navigation (so the animation isn't interrupted)
-    window.history.replaceState(null, "", `/auth?mode=${next}`);
+  const switchTo = (target: Mode) => {
+    if (target === mode) return;
+    setDirection(target === "signup" ? "right" : "left");
+    setMode(target);
+    // keep the URL in sync (and keep ?next) without a navigation
+    const params = new URLSearchParams(window.location.search);
+    params.set("mode", target);
+    window.history.replaceState(null, "", `/auth?${params}`);
   };
 
   return (
@@ -85,9 +103,15 @@ export default function AuthCard({ initialMode }: { initialMode: Mode }) {
             }`}
           >
             {mode === "signin" ? (
-              <SignInForm onSwitch={() => switchTo("signup")} />
+              <SignInForm
+                onSwitch={() => switchTo("signup")}
+                redirectTo={redirectTo}
+              />
             ) : (
-              <SignUpForm onSwitch={() => switchTo("signin")} />
+              <SignUpForm
+                onSwitch={() => switchTo("signin")}
+                redirectTo={redirectTo}
+              />
             )}
           </div>
         </div>
@@ -96,15 +120,32 @@ export default function AuthCard({ initialMode }: { initialMode: Mode }) {
   );
 }
 
-function SignInForm({ onSwitch }: { onSwitch: () => void }) {
-  const [loading, setLoading] = useState(false);
+function RootError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p role="alert" className="text-xs sm:text-[13px] text-red-600 font-medium">
+      {message}
+    </p>
+  );
+}
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    const data = new FormData(e.currentTarget);
-    // TODO: call your sign-in action with data.get("email") / data.get("password")
-    setLoading(false);
+function SignInForm({
+  onSwitch,
+  redirectTo,
+}: {
+  onSwitch: () => void;
+  redirectTo?: string;
+}) {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInValues>({ resolver: zodResolver(SignInSchema) });
+
+  async function onSubmit(values: SignInValues) {
+    const res = await signIn(values, redirectTo); // redirects on success
+    if (res?.error) setError("root", { message: res.error });
   }
 
   return (
@@ -113,20 +154,29 @@ function SignInForm({ onSwitch }: { onSwitch: () => void }) {
         title="Welcome back"
         subtitle="Sign in to your ResumeIQ account"
       />
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 sm:gap-5 w-full">
-        <Field label="Email address" htmlFor="signin-email">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="flex flex-col gap-4 sm:gap-5 w-full"
+      >
+        <Field
+          label="Email address"
+          htmlFor="signin-email"
+          error={errors.email?.message}
+        >
           <TextInput
             id="signin-email"
-            name="email"
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
-            required
+            aria-invalid={!!errors.email}
+            {...register("email")}
           />
         </Field>
         <Field
           label="Password"
           htmlFor="signin-password"
+          error={errors.password?.message}
           aside={
             <Link
               href="/auth/forgot-password"
@@ -138,13 +188,14 @@ function SignInForm({ onSwitch }: { onSwitch: () => void }) {
         >
           <PasswordInput
             id="signin-password"
-            name="password"
             autoComplete="current-password"
             placeholder="••••••••"
-            required
+            aria-invalid={!!errors.password}
+            {...register("password")}
           />
         </Field>
-        <SubmitButton loading={loading}>Sign in</SubmitButton>
+        <RootError message={errors.root?.message} />
+        <SubmitButton loading={isSubmitting}>Sign in</SubmitButton>
       </form>
       <Divider />
       <GoogleButton />
@@ -162,15 +213,52 @@ function SignInForm({ onSwitch }: { onSwitch: () => void }) {
   );
 }
 
-function SignUpForm({ onSwitch }: { onSwitch: () => void }) {
-  const [loading, setLoading] = useState(false);
+function SignUpForm({
+  onSwitch,
+  redirectTo,
+}: {
+  onSwitch: () => void;
+  redirectTo?: string;
+}) {
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpValues>({ resolver: zodResolver(SignUpSchema) });
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    const data = new FormData(e.currentTarget);
-    // TODO: call your sign-up action with name / email / password
-    setLoading(false);
+  async function onSubmit(values: SignUpValues) {
+    const res = await signUp(values, redirectTo); // redirects if no confirmation needed
+    if (res?.error) return setError("root", { message: res.error });
+    if (res?.message) setSentTo(values.email);
+  }
+
+  if (sentTo) {
+    return (
+      <div className="flex flex-col items-center gap-5 sm:gap-6 w-full">
+        <div className="size-11 sm:size-12 rounded-full bg-primary-600/10 text-primary-600 flex items-center justify-center">
+          <MailCheck className="size-5 sm:size-6" />
+        </div>
+        <div className="flex flex-col gap-1 items-center text-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-black">
+            Check your email
+          </h1>
+          <p className="text-xs sm:text-sm text-dark-gray">
+            We sent a confirmation link to{" "}
+            <span className="font-semibold text-black break-all">{sentTo}</span>
+            . Click it to finish creating your account.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onSwitch}
+          className={`${linkClass} text-xs sm:text-sm cursor-pointer`}
+        >
+          Back to sign in
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -179,37 +267,56 @@ function SignUpForm({ onSwitch }: { onSwitch: () => void }) {
         title="Create your account"
         subtitle="Start getting actionable resume feedback"
       />
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 sm:gap-5 w-full">
-        <Field label="Full name" htmlFor="signup-name">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="flex flex-col gap-4 sm:gap-5 w-full"
+      >
+        <Field
+          label="Full name"
+          htmlFor="signup-name"
+          error={errors.fullName?.message}
+        >
           <TextInput
             id="signup-name"
-            name="name"
             autoComplete="name"
             placeholder="Alex Kim"
-            required
+            aria-invalid={!!errors.fullName}
+            {...register("fullName")}
           />
         </Field>
-        <Field label="Email address" htmlFor="signup-email">
+        <Field
+          label="Email address"
+          htmlFor="signup-email"
+          error={errors.email?.message}
+        >
           <TextInput
             id="signup-email"
-            name="email"
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
-            required
+            aria-invalid={!!errors.email}
+            {...register("email")}
           />
         </Field>
-        <Field label="Password" htmlFor="signup-password">
+        <Field
+          label="Password"
+          htmlFor="signup-password"
+          error={errors.password?.message}
+        >
           <PasswordInput
             id="signup-password"
-            name="password"
             autoComplete="new-password"
             placeholder="8+ characters"
-            minLength={8}
-            required
+            aria-invalid={!!errors.password}
+            {...register("password")}
           />
+          <p className="text-[11px] sm:text-xs text-dark-gray">
+            8+ characters with upper and lower case, a number, and a symbol.
+          </p>
         </Field>
-        <SubmitButton loading={loading}>Create account</SubmitButton>
+        <RootError message={errors.root?.message} />
+        <SubmitButton loading={isSubmitting}>Create account</SubmitButton>
       </form>
       <Divider />
       <GoogleButton />

@@ -3,6 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, MailCheck } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ForgotSchema, type ForgotValues } from "@/lib/schemas/auth";
+import { sendResetLink } from "@/app/auth/actions";
 import {
   Field,
   FormHeader,
@@ -12,16 +16,18 @@ import {
 } from "./form-controls";
 
 export default function ForgotPasswordForm() {
-  const [loading, setLoading] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<ForgotValues>({ resolver: zodResolver(ForgotSchema) });
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    const email = String(new FormData(e.currentTarget).get("email"));
-    // TODO: call your "send reset link" action with `email`
-    setLoading(false);
-    setSentTo(email);
+  async function onSubmit(values: ForgotValues) {
+    const res = await sendResetLink(values);
+    if (res?.error) return setError("root", { message: res.error });
+    setSentTo(values.email);
   }
 
   if (sentTo) {
@@ -61,18 +67,26 @@ export default function ForgotPasswordForm() {
         title="Forgot your password?"
         subtitle="Enter your email and we'll send you a reset link"
       />
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 sm:gap-5 w-full">
-        <Field label="Email address" htmlFor="forgot-email">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="flex flex-col gap-4 sm:gap-5 w-full"
+      >
+        <Field
+          label="Email address"
+          htmlFor="forgot-email"
+          error={errors.email?.message ?? errors.root?.message}
+        >
           <TextInput
             id="forgot-email"
-            name="email"
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
-            required
+            aria-invalid={!!errors.email}
+            {...register("email")}
           />
         </Field>
-        <SubmitButton loading={loading}>Send reset link</SubmitButton>
+        <SubmitButton loading={isSubmitting}>Send reset link</SubmitButton>
       </form>
       <div className="flex justify-center">
         <BackToSignIn />
