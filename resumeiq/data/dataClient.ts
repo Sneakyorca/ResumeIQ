@@ -12,6 +12,7 @@ export type ResumeFormData = {
 const RESUME_KEY = "resume-draft";
 const FILE_KEY = "resume-file-name";
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const PARSE_TIMEOUT_MS = 70_000; // a bit longer than the route's maxDuration (60s)
 
 export function useResumeForm() {
   const {
@@ -42,9 +43,11 @@ export function useResumeForm() {
     } catch {}
   }, [setValue]);
 
-  // save whenever the resume text changes (typing, sample, parsed file)
+  // save whenever the resume text changes, and clear the file error
+  // when the user edits the text themselves
   useEffect(() => {
-    const sub = watch((value) => {
+    const sub = watch((value, { type }) => {
+      if (type === "change") setFileError(""); // only fires for real typing, not setValue
       try {
         if (value.resume) sessionStorage.setItem(RESUME_KEY, value.resume);
         else sessionStorage.removeItem(RESUME_KEY);
@@ -53,23 +56,46 @@ export function useResumeForm() {
     return () => sub.unsubscribe();
   }, [watch]);
 
-  function handleSample() {
-    setFileError("");
-    setFileName("");
+  function clearSavedFileName() {
     try {
       sessionStorage.removeItem(FILE_KEY);
     } catch {}
+  }
+
+  function handleSample() {
+    setFileError("");
+    setFileName("");
+    clearSavedFileName();
     setValue("resume", sampleResume, {
       shouldValidate: true,
       shouldDirty: true,
     });
   }
+
   async function parseResume(file: File) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), PARSE_TIMEOUT_MS);
+
     let response: Response;
     try {
-      response = await fetch("/api/parse", { method: "POST", body: file });
-    } catch {
-      throw new Error("Couldn't reach the server. Check your connection.");
+      response = await fetch("/api/parse", {
+        method: "POST",
+        body: file,
+        signal: controller.signal,
+      });
+    } catch (err) {
+      throw new Error(
+        err instanceof DOMException && err.name === "AbortError"
+          ? "That took too long. Try again, or paste the text instead."
+          : "Couldn't reach the server. Check your connection.",
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (response.status === 401) {
+      router.push("/auth?next=/analyze");
+      throw new Error("Please sign in to continue.");
     }
 
     let result: { text?: string; error?: string } = {};
@@ -109,6 +135,7 @@ export function useResumeForm() {
       } catch {}
     } catch (err) {
       setFileName("");
+      clearSavedFileName();
       setFileError(
         err instanceof Error
           ? err.message
@@ -118,6 +145,7 @@ export function useResumeForm() {
       setIsParsing(false);
     }
   }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) processFile(selectedFile);
@@ -152,6 +180,11 @@ export function useResumeForm() {
         body: JSON.stringify({ ...data, fileName }),
       });
 
+      if (response.status === 401) {
+        router.push("/auth?next=/analyze");
+        throw new Error("Please sign in to continue.");
+      }
+
       let result: { message?: unknown } = {};
       try {
         result = await response.json();
@@ -167,9 +200,7 @@ export function useResumeForm() {
 
       reset();
       setFileName("");
-      try {
-        sessionStorage.removeItem(FILE_KEY);
-      } catch {}
+      clearSavedFileName();
       router.push("/reports");
     } catch (error) {
       setError("resume", {

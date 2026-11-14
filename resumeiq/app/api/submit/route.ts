@@ -1,7 +1,16 @@
 import { analyzeResume, type Report } from "@/lib/ai/analyzeText";
 import { saveReport } from "@/lib/reports";
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return Response.json({ message: "Please sign in." }, { status: 401 });
+  }
+
   try {
     const { resume, fileName } = await request.json();
 

@@ -1,3 +1,4 @@
+import "server-only";
 import { reports } from "@/data/data";
 import type { Report, ReportView } from "@/lib/ai/analyzeText";
 import { timeAgo } from "@/lib/timeAgo";

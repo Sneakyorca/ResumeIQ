@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/site/Navbar";
 import Footer from "../components/site/Footer";
+import { getUser } from "./auth/actions";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,14 +25,15 @@ export const metadata: Metadata = {
   description: "...",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const { navUser } = await getUser();
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col text-black">
-        <Navbar />
+        <Navbar user={navUser} />
         {children}
         <Footer />
       </body>

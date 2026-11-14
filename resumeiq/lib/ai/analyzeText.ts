@@ -1,3 +1,4 @@
+import "server-only";
 import { ai, withModelFallback } from "@/lib/gemini";
 import * as z from "zod";
 

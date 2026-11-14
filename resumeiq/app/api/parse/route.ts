@@ -1,7 +1,9 @@
-export const maxDuration = 60;
 import { PDFParse } from "pdf-parse";
 import { extractTextWithGemini } from "@/lib/ai/extractText";
 import mammoth from "mammoth";
+import { createClient } from "@/utils/supabase/server";
+
+export const maxDuration = 60;
 
 const MIN_CHARS = 50;
 
@@ -32,6 +34,22 @@ function detectFileType(buffer: Buffer): "pdf" | "docx" | "unknown" {
 }
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return Response.json({ error: "Please sign in." }, { status: 401 });
+  }
+
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > 10 * 1024 * 1024) {
+    return Response.json(
+      { error: "File is too large (max 10 MB)." },
+      { status: 413 },
+    );
+  }
+
   const buffer = Buffer.from(await request.arrayBuffer());
 
   if (buffer.byteLength === 0) {

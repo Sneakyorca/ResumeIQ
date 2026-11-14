@@ -1,13 +1,12 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { isLoggedIn } from "./data/data";
+import { type NextRequest } from "next/server";
+import { updateSession } from "@/utils/supabase/proxy";
 
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === "/profile" && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/auth", request.nextUrl));
-  }
-  return NextResponse.next();
+  return await updateSession(request);
 }
 
 export const config = {
-  matcher: ["/profile"],
+  matcher: [
+    "/((?!api/parse|api/submit|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

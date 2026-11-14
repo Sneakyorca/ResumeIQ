@@ -1,3 +1,4 @@
+import "server-only";
 import { createPartFromUri, createUserContent } from "@google/genai";
 import { ai, withModelFallback } from "@/lib/gemini";
 
