@@ -36,7 +36,7 @@ type CardProps = {
 
 const Card = ({ id, title, desc }: CardProps) => {
   return (
-    <div className="p-4 sm:p-5 lg:p-6 bg-background rounded-lg text-left">
+    <div className="p-4 sm:p-5 lg:p-6 bg-background rounded-lg text-left border-[1.5px] border-border">
       <span className="text-primary font-black inline-block font-inter text-[28px] lg:text-[36px] mb-3 sm:mb-4 lg:mb-5">
         {id}
       </span>

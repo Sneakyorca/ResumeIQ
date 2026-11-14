@@ -3,6 +3,7 @@
 import { useResumeForm } from "@/data/dataClient";
 import { Separator } from "../ui/separator";
 import { AnalyzeButton, TextArea } from "../common/Analyze";
+import { TriangleAlert } from "lucide-react";
 
 const Analyze = () => {
   const {
@@ -20,7 +21,10 @@ const Analyze = () => {
     handleDragLeave,
     handleDrop,
     isParsing,
+    fileError,
   } = useResumeForm();
+
+  const formError = errors.resume?.message?.toString();
 
   return (
     <form
@@ -35,7 +39,11 @@ const Analyze = () => {
         handleDrop={handleDrop}
         isParsing={isParsing}
         className={`placeholder:text-light-gray resize-none text-black font-inter rounded-lg p-3.5 text-[14px] w-full h-40 sm:h-45 md:h-60 md:p-5 lg:text-[15px] border outline-light-gray ${
-          isDragging ? "border-primary bg-primary/5" : "border-border bg-white"
+          fileError || formError
+            ? "border-red-500"
+            : isDragging
+              ? "border-primary bg-primary/5"
+              : "border-border bg-white"
         }`}
       />
 
@@ -46,11 +54,18 @@ const Analyze = () => {
         hidden
         onChange={handleFileChange}
       />
+
       <div className="flex justify-center sm:justify-between items-center w-full">
         <ul className="text-dark-gray gap-3 sm:gap-4 flex flex-col sm:flex-row [&>li>button,&>button]:underline [&>li>button,&>button]:text-[13px] [&>li>button,&>button]:cursor-pointer [&>li>button,&>button]:lg:text-[14px] justify-center items-center">
           <li>
-            <button type="button" onClick={() => fileInputRef.current?.click()}>
-              {fileName || "Upload a file instead (.pdf, .docx)"}
+            <button
+              type="button"
+              disabled={isParsing}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {isParsing
+                ? `Reading ${fileName}…`
+                : fileName || "Upload a file instead (.pdf, .docx, max 10 MB)"}
             </button>
           </li>
           <Separator
@@ -67,12 +82,29 @@ const Analyze = () => {
           No credit card required
         </span>
       </div>
-      {errors.resume && (
-        <p className="text-red-500 text-[13px] font-inter">
-          {errors.resume.message?.toString()}
+
+      {/* file errors: too big, wrong type, unreadable, not signed in */}
+      {fileError && (
+        <p
+          role="alert"
+          className="flex items-start gap-1.5 self-start text-red-500 text-[13px] font-inter"
+        >
+          <TriangleAlert className="size-4 shrink-0 mt-px" />
+          {fileError}
         </p>
       )}
-      <AnalyzeButton isSubmitting={isSubmitting} />
+
+      {/* form errors: empty text, or a failed submit */}
+      {formError && (
+        <p
+          role="alert"
+          className="self-start text-red-500 text-[13px] font-inter"
+        >
+          {formError}
+        </p>
+      )}
+
+      <AnalyzeButton isSubmitting={isSubmitting} isParsing={isParsing} />
     </form>
   );
 };
