@@ -13,7 +13,7 @@ const FinalCTA = () => {
       </p>
       <div className="pt-0 sm:pt-2">
         <Link
-          href="/"
+          href="/auth"
           className="bg-primary inline-flex items-center justify-center w-full sm:w-51.5 lg:w-54 h-10.5 lg:h-11.75 px-6 sm:px-8 rounded-md text-[15px] lg:text-[16px] font-semibold font-inter text-white tracking-wider mb-5 sm:mb-2 lg:mb-3"
         >
           Get Started Free

@@ -27,11 +27,26 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const path = request.nextUrl.pathname;
+  function safeNext(next: string | null) {
+    return next &&
+      next.startsWith("/") &&
+      !next.startsWith("//") &&
+      !next.startsWith("/\\")
+      ? next
+      : "/reports";
+  }
+
+  // inside updateSession, after `user` and `path` exist:
+  if (user && path === "/auth") {
+    const url = request.nextUrl.clone();
+    url.pathname = safeNext(request.nextUrl.searchParams.get("next"));
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
   const needsLogin = PROTECTED.some(
     (p) => path === p || path.startsWith(p + "/"),
   );

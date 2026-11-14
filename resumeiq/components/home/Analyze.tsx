@@ -65,7 +65,7 @@ const Analyze = () => {
             >
               {isParsing
                 ? `Reading ${fileName}…`
-                : fileName || "Upload a file instead (.pdf, .docx, max 10 MB)"}
+                : fileName || "Upload a file instead (.pdf, .docx, max 4 MB)"}
             </button>
           </li>
           <Separator

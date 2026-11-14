@@ -9,6 +9,7 @@ type ScoreCard = {
   overview: string;
   relativeDate: string;
   report: ReportView;
+  feedback: string;
 };
 const ScoreCard = ({
   score,
@@ -16,6 +17,7 @@ const ScoreCard = ({
   overview,
   relativeDate,
   report,
+  feedback,
 }: ScoreCard) => {
   return (
     <>
@@ -23,24 +25,24 @@ const ScoreCard = ({
         <div className="flex gap-3 items-center">
           <ScoreRing score={score} size="xl" />
           <div className="flex flex-col items-start gap-0.5">
-            <h4 className="font-extrabold text-[18px]">
-              Good, with room to improve
-            </h4>
+            <h4 className="font-extrabold text-[18px]">{feedback}</h4>
             <p className="text-xs text-dark-gray">{fileName}</p>
           </div>
         </div>
         <p className="text-dark-gray text-[13px] leading-[22px]">{overview}</p>
         <div className="gap-2 flex">
-          <button
-            className={`px-3 py-1.5 rounded-md border-[1.5px] border-border font-semibold text-[11px] flex-1 hover:bg-background  cursor-pointer`}
-          >
-            Copy report
-          </button>
-          <button
-            className={`px-3 py-1.5 rounded-md border-[1.5px] border-border font-semibold text-white bg-black hover:bg-black/90 text-[11px] flex-1 cursor-pointer`}
-          >
-            Export PDF
-          </button>
+          <div className="gap-2 flex">
+            <CopyButton
+              text="Copy"
+              text2="full"
+              text3="report"
+              className="px-3 py-1.5 rounded-md border-[1.5px] border-border font-semibold text-[11px] flex-1 flex items-center justify-center text-nowrap hover:bg-background cursor-pointer"
+              iconClass="pl-1 size-3.5 stroke-3"
+              textAfter="Report Copied"
+              copyItem={report}
+            />
+            <ExportButton report={report} />
+          </div>
         </div>
       </div>
       <div className="border-[1.5px] rounded-xl border-border p-4 sm:p-6 lg:p-8 hidden sm:flex gap-4 sm:gap-6 lg:gap-8 bg-white items-center">
@@ -49,7 +51,7 @@ const ScoreCard = ({
           <div className="flex justify-between items-center flex-1">
             <div className="flex flex-col items-start gap-0.5">
               <h4 className="font-extrabold text-[18px] sm:text-[20px] lg:text-[24px]">
-                Good, with room to improve
+                {feedback}
               </h4>
               <div className="flex items-center gap-1 sm:gap-1 lg:gap-2 text-xs sm:text-[13px] lg:text-sm text-dark-gray">
                 <p>{fileName}</p>

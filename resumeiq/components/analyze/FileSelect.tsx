@@ -64,7 +64,7 @@ export const FileSelect = ({
             Drag & drop your resume here
           </p>
           <p className="text-xs lg:text-[13px] text-light-gray">
-            Supports PDF and DOCX, up to 10 MB
+            Supports PDF and DOCX, up to 4 MB
           </p>
         </div>
 

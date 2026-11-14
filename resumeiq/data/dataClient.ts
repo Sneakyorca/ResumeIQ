@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { sampleResume } from "@/data/data";
 import { useRouter } from "next/navigation";
+import { MAX_UPLOAD_BYTES } from "@/lib/limits";
 
 export type ResumeFormData = {
   resume: string;
@@ -11,7 +12,6 @@ export type ResumeFormData = {
 
 const RESUME_KEY = "resume-draft";
 const FILE_KEY = "resume-file-name";
-const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const PARSE_TIMEOUT_MS = 70_000; // a bit longer than the route's maxDuration (60s)
 
 export function useResumeForm() {
@@ -119,7 +119,7 @@ export function useResumeForm() {
       setFileError("Please upload a .pdf or .docx file.");
       return;
     }
-    if (selectedFile.size > MAX_FILE_BYTES) {
+    if (selectedFile.size > MAX_UPLOAD_BYTES) {
       setFileError("That file is too large. The limit is 10 MB.");
       return;
     }
@@ -185,7 +185,7 @@ export function useResumeForm() {
         throw new Error("Please sign in to continue.");
       }
 
-      let result: { message?: unknown } = {};
+      let result: { message?: unknown; id?: string } = {};
       try {
         result = await response.json();
       } catch {}
@@ -201,7 +201,7 @@ export function useResumeForm() {
       reset();
       setFileName("");
       clearSavedFileName();
-      router.push("/reports");
+      router.push(result.id ? `/reports/${result.id}` : "/reports");
     } catch (error) {
       setError("resume", {
         type: "manual",

@@ -197,8 +197,8 @@ function SignInForm({
         <RootError message={errors.root?.message} />
         <SubmitButton loading={isSubmitting}>Sign in</SubmitButton>
       </form>
-      <Divider />
-      <GoogleButton />
+      {/* <Divider /> */}
+      {/* <GoogleButton /> */}
       <p className="text-xs sm:text-sm text-dark-gray text-center">
         Don&apos;t have an account?{" "}
         <button
@@ -318,8 +318,8 @@ function SignUpForm({
         <RootError message={errors.root?.message} />
         <SubmitButton loading={isSubmitting}>Create account</SubmitButton>
       </form>
-      <Divider />
-      <GoogleButton />
+      {/* <Divider /> */}
+      {/* <GoogleButton /> */}
       <div className="flex flex-col gap-3 sm:gap-4 items-center">
         <p className="text-xs sm:text-sm text-dark-gray text-center">
           Already have an account?{" "}

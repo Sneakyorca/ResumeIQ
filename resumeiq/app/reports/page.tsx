@@ -43,7 +43,7 @@ const InfoCard = ({ reports }: { reports: ReportView[] }) => {
     <>
       {reports.map((report) => (
         <div
-          key={report.createdAt}
+          key={report.id}
           className="rounded-lg flex p-3.5 gap-3 sm:p-4 sm:gap-4 lg:gap-6 lg:p-5 border-[1.5px] border-border items-center bg-white"
         >
           <ScoreRing score={report.overallScore} size="medium" />
@@ -58,7 +58,7 @@ const InfoCard = ({ reports }: { reports: ReportView[] }) => {
             </div>
           </div>
           <Link
-            href={`/reports/${report.createdAt}`}
+            href={`/reports/${report.id}`}
             className="px-2.5 py-1.5 sm:px-3 lg:px-4 lg:py-2 border-[1.5px] border-border rounded-sm font-semibold text-[11px] lg:text-[13px] inline-block self-center justify-self-end hover:bg-background"
           >
             View <span className="hidden lg:inline">report</span>

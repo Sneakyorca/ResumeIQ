@@ -27,6 +27,7 @@ const ReportPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           <ScoreCard
             fileName={report.fileName}
             overview={report.overview}
+            feedback={report.feedBack}
             score={report.overallScore}
             relativeDate={report.relativeDate}
             report={report}

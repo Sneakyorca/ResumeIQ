@@ -25,11 +25,9 @@ export async function POST(request: Request) {
       ...analysis,
       fileName:
         typeof fileName === "string" && fileName ? fileName : "Pasted resume",
-      createdAt: now,
     };
-    await saveReport(report);
-
-    return Response.json({ message: report }, { status: 200 });
+    const id = await saveReport(report);
+    return Response.json({ id }, { status: 200 });
   } catch (error) {
     console.error("Error analyzing resume:", error);
     const busy = String(error).includes("429");

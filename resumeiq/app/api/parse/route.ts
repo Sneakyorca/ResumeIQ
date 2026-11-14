@@ -2,6 +2,7 @@ import { PDFParse } from "pdf-parse";
 import { extractTextWithGemini } from "@/lib/ai/extractText";
 import mammoth from "mammoth";
 import { createClient } from "@/utils/supabase/server";
+import { MAX_UPLOAD_BYTES } from "@/lib/limits";
 
 export const maxDuration = 60;
 
@@ -43,9 +44,9 @@ export async function POST(request: Request) {
   }
 
   const declared = Number(request.headers.get("content-length") ?? 0);
-  if (declared > 10 * 1024 * 1024) {
+  if (declared > MAX_UPLOAD_BYTES) {
     return Response.json(
-      { error: "File is too large (max 10 MB)." },
+      { error: "File is too large (max 4 MB)." },
       { status: 413 },
     );
   }
@@ -55,9 +56,9 @@ export async function POST(request: Request) {
   if (buffer.byteLength === 0) {
     return Response.json({ error: "Empty file." }, { status: 400 });
   }
-  if (buffer.byteLength > 10 * 1024 * 1024) {
+  if (buffer.byteLength > MAX_UPLOAD_BYTES) {
     return Response.json(
-      { error: "File is too large (max 10 MB)." },
+      { error: "File is too large (max 4 MB)." },
       { status: 413 },
     );
   }
