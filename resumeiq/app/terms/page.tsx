@@ -7,9 +7,10 @@ export default function TermsPage() {
     <LegalPage title="Terms of Service" updated="November 14, 2026">
       <Section heading="Using ResumeIQ">
         <p>
-          ResumeIQ analyzes resumes and gives AI-generated feedback. By creating
-          an account you agree to these terms. You must be old enough to enter a
-          binding agreement where you live.
+          ResumeIQ is a free personal project that analyzes resumes and gives
+          AI-generated feedback. By creating an account you agree to these
+          terms. You must be old enough to enter a binding agreement where you
+          live.
         </p>
       </Section>
 
@@ -40,8 +41,10 @@ export default function TermsPage() {
 
       <Section heading="Availability">
         <p>
-          The service is provided as is. It may be slow, limited, or unavailable
-          at times, and usage limits may apply.
+          The service is provided as is, with no warranty. It&apos;s run by one
+          person, so it may be slow, limited, or unavailable at times, and it
+          may be changed or shut down without notice. Keep your own copy of any
+          resume or report you care about.
         </p>
       </Section>
 
@@ -54,8 +57,9 @@ export default function TermsPage() {
 
       <Section heading="Changes and contact">
         <p>
-          We may update these terms and will change the date above when we do.
-          Questions: support@yourdomain.com
+          ResumeIQ is run by Abdulmaleek Odetunde. We may update these terms and
+          will change the date above when we do. Questions:
+          resumeiq.help@gmail.com
         </p>
       </Section>
     </LegalPage>

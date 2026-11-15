@@ -5,6 +5,23 @@ export const metadata = { title: "Privacy Policy | ResumeIQ" };
 export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" updated="November 14, 2026">
+      <Section heading="About this project">
+        <p>
+          ResumeIQ is a personal project run by Abdulmaleek Odetunde, an
+          individual developer, not a company. See more of my work at{" "}
+          <a
+            href="https://portfolio-puce-eta-57.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-primary underline underline-offset-2"
+          >
+            my portfolio
+          </a>
+          . ResumeIQ is offered free of charge and may change or be shut down at
+          any time. If it is shut down, stored accounts and reports will be
+          deleted.
+        </p>
+      </Section>
       <Section heading="What we collect">
         <p>
           Your account details (name, email, and a password stored in hashed
@@ -60,7 +77,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section heading="Contact">
-        <p>support@yourdomain.com</p>
+        <p>resumeiq.help@gmail.com</p>
       </Section>
     </LegalPage>
   );
