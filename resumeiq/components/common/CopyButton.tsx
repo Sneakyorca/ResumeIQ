@@ -101,11 +101,11 @@ ${item.reason}
         </>
       ) : (
         <>
-          {text}
-          <span className="hidden sm:inline mx-1">
-            {text2 ? `${text2}` : ""}
+          <span>
+            {text}
+            {text2 && <span className="hidden sm:inline"> {text2}</span>}
+            {text3 && <> {text3}</>}
           </span>
-          {text3}
           {copyIcon && (
             <Copy className="pl-1 size-3.5 sm:hidden stroke-3 inline-block" />
           )}

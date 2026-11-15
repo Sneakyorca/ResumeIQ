@@ -21,7 +21,7 @@ export const AnalysisSchema = z.object({
   feedBack: z
     .string()
     .describe(
-      "One sentence, under 20 words, summarizing the resume's main strength and biggest weakness",
+      "One sentence, under 10 words, summarizing the resume's main strength and biggest weakness",
     ),
   overview: z.string(),
   assessment: z.object({
@@ -50,7 +50,7 @@ export async function analyzeResume(resumeText: string): Promise<Analysis> {
   const output = await withModelFallback(async (model) => {
     const interaction = await ai.interactions.create({
       model,
-      input: `You are a resume reviewer. Analyze the resume below and score each category from 0 to 100. For lineByLineReview, quote a real weak line from the resume as "before" and rewrite it as "after". - feedBack must be a single sentence of at most 20 words.
+      input: `You are a resume reviewer. Analyze the resume below and score each category from 0 to 100. For lineByLineReview, quote a real weak line from the resume as "before" and rewrite it as "after". - feedBack must be a single sentence of at most 10 words.
 \n\nRESUME:\n${resumeText}`,
       response_format: {
         type: "text",
