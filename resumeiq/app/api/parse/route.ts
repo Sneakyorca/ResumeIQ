@@ -1,8 +1,9 @@
+import { CanvasFactory } from "pdf-parse/worker"; // must come before pdf-parse
 import { PDFParse } from "pdf-parse";
 import { extractTextWithGemini } from "@/lib/ai/extractText";
 import mammoth from "mammoth";
 import { createClient } from "@/utils/supabase/server";
-import { MAX_UPLOAD_BYTES } from "@/lib/limits";
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from "@/lib/limits";
 
 export const maxDuration = 60;
 
@@ -35,6 +36,18 @@ function detectFileType(buffer: Buffer): "pdf" | "docx" | "unknown" {
 }
 
 export async function POST(request: Request) {
+  try {
+    return await handle(request);
+  } catch (err) {
+    console.error("Parse route failed:", err);
+    return Response.json(
+      { error: "Something went wrong on our side. Try again in a moment." },
+      { status: 500 },
+    );
+  }
+}
+
+async function handle(request: Request): Promise<Response> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -46,7 +59,7 @@ export async function POST(request: Request) {
   const declared = Number(request.headers.get("content-length") ?? 0);
   if (declared > MAX_UPLOAD_BYTES) {
     return Response.json(
-      { error: "File is too large (max 4 MB)." },
+      { error: `File is too large (max ${MAX_UPLOAD_LABEL}).` },
       { status: 413 },
     );
   }
@@ -58,10 +71,11 @@ export async function POST(request: Request) {
   }
   if (buffer.byteLength > MAX_UPLOAD_BYTES) {
     return Response.json(
-      { error: "File is too large (max 4 MB)." },
+      { error: `File is too large (max ${MAX_UPLOAD_LABEL}).` },
       { status: 413 },
     );
   }
+
   const fileType = detectFileType(buffer);
 
   if (fileType === "unknown") {
@@ -71,8 +85,7 @@ export async function POST(request: Request) {
     );
   }
 
-  //DOCX handler
-
+  // DOCX handler
   if (fileType === "docx") {
     try {
       const result = await mammoth.extractRawText({ buffer });
@@ -96,8 +109,7 @@ export async function POST(request: Request) {
   }
 
   // PDF handler
-
-  const parser = new PDFParse({ data: new Uint8Array(buffer) });
+  const parser = new PDFParse({ data: new Uint8Array(buffer), CanvasFactory });
 
   try {
     let text = cleanText((await parser.getText()).text);
