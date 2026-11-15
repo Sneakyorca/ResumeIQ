@@ -21,10 +21,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ResumeIQ",
-  description: "...",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  title: {
+    default: "ResumeIQ — AI resume review",
+    template: "%s | ResumeIQ",
+  },
+  description:
+    "Upload your resume and get an instant score, category feedback, and line-by-line rewrites.",
+  openGraph: {
+    type: "website",
+    siteName: "ResumeIQ",
+    title: "ResumeIQ — AI resume review",
+    description:
+      "Instant resume score, category feedback, and line-by-line rewrites.",
+  },
+  twitter: { card: "summary_large_image" },
 };
-
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { navUser } = await getUser();
   return (

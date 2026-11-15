@@ -6,6 +6,12 @@ import ImprovementCard from "@/components/report/ImprovementCard";
 import { Separator } from "@/components/ui/separator";
 import { notFound } from "next/navigation";
 import { getReport } from "@/lib/reports";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Report",
+  robots: { index: false },
+};
 
 const ReportPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;

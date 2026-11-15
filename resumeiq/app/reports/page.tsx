@@ -3,9 +3,13 @@ import { getReports } from "@/lib/reports";
 import type { ReportView } from "@/lib/ai/analyzeText";
 import { FileX } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
-
+export const metadata: Metadata = {
+  title: "Your reports",
+  robots: { index: false },
+};
 const ReportDashboard = async () => {
   const reports = await getReports();
 

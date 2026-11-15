@@ -1,6 +1,6 @@
 import { LegalPage, Section } from "@/components/legal/LegalPage";
 
-export const metadata = { title: "Terms of Service | ResumeIQ" };
+export const metadata = { title: "Terms of Service" };
 
 export default function TermsPage() {
   return (

@@ -1,7 +1,6 @@
 import { LegalPage, Section } from "@/components/legal/LegalPage";
 
-export const metadata = { title: "Privacy Policy | ResumeIQ" };
-
+export const metadata = { title: "Privacy Policy" };
 export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" updated="November 14, 2026">
