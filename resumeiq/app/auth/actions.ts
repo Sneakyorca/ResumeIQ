@@ -57,7 +57,7 @@ export async function signUp(
   const { email, password, fullName } = parsed.data;
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -66,18 +66,6 @@ export async function signUp(
     },
   });
   if (error) return { error: error.message };
-
-  // a session exists only when email confirmation is off
-  if (data.user && data.session) {
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert({ id: data.user.id, full_name: fullName });
-    if (profileError) {
-      console.error("Profile insert failed:", profileError.message);
-    }
-    revalidatePath("/", "layout");
-    redirect(safeNext(next));
-  }
 
   return { message: "Check your email to confirm your account." };
 }
