@@ -62,12 +62,12 @@ const Navbar = ({
 
         <ul className="flex gap-5 items-center justify-center">
           <li className="hidden sm:block">
-            <Link
-              href="/reports"
+            <a
+              href="mailto:resumeiq.help@gmail.com?subject=ResumeIQ%20feedback"
               className="font-sans text-body-sm text-muted-gray font-semibold hover:text-black hover:font-bold"
             >
               Feedback
-            </Link>
+            </a>
           </li>
 
           {/* dynamic data */}

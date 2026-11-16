@@ -5,7 +5,7 @@ const Features = () => {
   const items = [
     "ATS parsing validation",
     "Verbal impact analysis",
-    "Verbal impact analysis",
+    "Formatting check.",
   ];
   return (
     <section className="p-5 md:px-8 md:py-10 lg:p-12 xl:p-20 flex flex-col gap-6 sm:flex-row sm:gap-6 lg:gap-10 xl:gap-20 items-center">
@@ -14,7 +14,7 @@ const Features = () => {
           Why ResumeIQ
         </p>
         <h1 className="font-inter text-black font-extrabold text-[22px] sm:text-[24px] lg:text-[36px] mb-2 sm:mb-6">
-          Trusted by job seekers worldwide
+          Built for job seekers.
         </h1>
         <p className="text-dark-gray font-inter text-sm lg:text-[16px] mb-6">
           Actionable feedback powered by hiring best practices and ATS insights.

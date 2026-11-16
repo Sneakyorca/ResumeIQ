@@ -6,7 +6,10 @@ an overall score, category scores, and line-by-line rewrites.
 
 Built by [Abdulmaleek Odetunde](https://portfolio-puce-eta-57.vercel.app).
 
-<!-- Add a live demo link and one or two screenshots here once deployed. -->
+**Live demo:** https://resume-iq-seven-teal.vercel.app/
+
+![ResumeIQ landing page](docs/screenshots/landing.png)
+![ResumeIQ report](docs/screenshots/report.png)
 
 ## Features
 
@@ -221,7 +224,7 @@ proxy.ts                   Session refresh and protected-route redirects
 
 ## Contact
 
-Questions or account deletion requests: resumiq.help@gmail.com
+Questions or account deletion requests: resumeiq.help@gmail.com
 
 ## License and project status
 
